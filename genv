@@ -18,12 +18,6 @@ then
 elif [[ "$command" == 'status' ]]
 then
  ssh "$host" "LIBVIRT_DEFAULT_URI=qemu:///system /home/$USER/scripts/ssh-virsh/status"
-elif [[ "$command" == 'planets' ]]
-then
- ssh "$host" "LIBVIRT_DEFAULT_URI=qemu:///system /home/$USER/scripts/ssh-virsh/planets"
-elif [[ "$command" == 'debians' ]]
-then
- ssh "$host" "LIBVIRT_DEFAULT_URI=qemu:///system /home/$USER/scripts/ssh-virsh/debians"
 elif [[ "$command" == 'rstart' ]]
 then
  ssh "$host" "LIBVIRT_DEFAULT_URI=qemu:///system /home/$USER/scripts/ssh-virsh/rstart ${targets[@]}"
