@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 OPTIND=1
 while getopts "h:t:c:" options
 do
