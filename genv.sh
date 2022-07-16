@@ -3,28 +3,48 @@ OPTIND=1
 while getopts "h:t:c:" options
 do
  case "$options" in
-        h) host=$OPTARG;;
-        t) targets=($OPTARG);;
-        c) command=$OPTARG;;
+        h) host='qemu+ssh://'"$OPTARG"'/system';;
+        t) targets=($(echo "${OPTARG[@]/,/ }"));;
+        c) command="$OPTARG";;
  esac
 done
-
 if [[ "$command" == 'startall' ]]
 then
- ssh "$host" "LIBVIRT_DEFAULT_URI=qemu:///system /home/$USER/scripts/ssh-virsh/startall"
+ for i in $(virsh -c "$host" list --all --name)
+ do
+   virsh -c "$host" start "$i"
+ done
 elif [[ "$command" == 'stopall' ]]
 then
- ssh "$host" "LIBVIRT_DEFAULT_URI=qemu:///system /home/$USER/scripts/ssh-virsh/stopall"
+ for i in $(virsh -c "$host" list --all --name)
+ do
+   virsh -c "$host" shutdown "$i" --mode acpi
+ done
+elif [[ "$command" == "rebootall" ]]
+then
+  for i in $(virsh -c "$host" list --all --name)
+ do
+   virsh -c "$host" reboot "$i" --mode acpi
+ done
 elif [[ "$command" == 'status' ]]
 then
- ssh "$host" "LIBVIRT_DEFAULT_URI=qemu:///system /home/$USER/scripts/ssh-virsh/status"
+ virsh -c "$host" list --all
 elif [[ "$command" == 'rstart' ]]
 then
- ssh "$host" "LIBVIRT_DEFAULT_URI=qemu:///system /home/$USER/scripts/ssh-virsh/rstart ${targets[@]}"
+ for i in "${targets[@]}"
+ do
+   virsh -c "$host" start "$i"
+ done
 elif [[ "$command" ==  'rstop' ]]
 then
- ssh "$host" "LIBVIRT_DEFAULT_URI=qemu:///system /home/$USER/scripts/ssh-virsh/rstop ${targets[@]}"
+ for i in "${targets[@]}"
+ do
+   virsh -c "$host" shutdown "$i" --mode acpi
+ done
 elif [[ "$command" == 'rreboot' ]]
 then
- ssh "$host" "LIBVIRT_DEFAULT_URI=qemu:///system /home/$USER/scripts/ssh-virsh/rreboot ${targets[@]}"
+ for i in "${targets[@]}"
+ do
+   virsh -c "$host" reboot "$i" --mode acpi
+ done
 fi
