@@ -1,5 +1,5 @@
 # genv
-control virsh over ssh 
+virsh wrapper
 
 instructions:
 - git clone https://github.com/aplstroedel/genv.git
