@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 OPTIND=1
-while getopts "h:t:c:" options
+while getopts "h:t:c:i" options
 do
  case "$options" in
         h) host='qemu+ssh://'"$OPTARG"'/system';;
-        t) targets=($(echo "${OPTARG[@]/,/ }"));;
+        t) targets=($(echo "${OPTARG[@]//,/ }"));;
         c) command="$OPTARG";;
+	i) info=true
  esac
 done
 if [[ "$command" == 'startall' ]]
@@ -29,22 +30,35 @@ then
 elif [[ "$command" == 'status' ]]
 then
  virsh -c "$host" list --all
-elif [[ "$command" == 'rstart' ]]
+elif [[ "$command" == 'start' ]]
 then
  for i in "${targets[@]}"
  do
    virsh -c "$host" start "$i"
  done
-elif [[ "$command" ==  'rstop' ]]
+elif [[ "$command" ==  'stop' ]]
 then
  for i in "${targets[@]}"
  do
    virsh -c "$host" shutdown "$i" --mode acpi
  done
-elif [[ "$command" == 'rreboot' ]]
+elif [[ "$command" == 'reboot' ]]
 then
  for i in "${targets[@]}"
  do
    virsh -c "$host" reboot "$i" --mode acpi
  done
+elif [[ "$info" ]]
+then
+ echo -e "howto:\n\n
+  start all vms: ./genv.sh -h [user@server] -c startall\n
+  shutdown all vms: ./genv.sh -h [user@server] -c stopall\n
+  reboot all vms: ./genv.sh -h [user@server] -c rebootall\n
+  print status of all vms: ./genv.sh -h [user@server] -c status\n
+  start random chosen vms: ./genv.sh -h [user@server] -c rstart -t vm1,vm2,vm3\n
+  stop random chosen vms: ./genv.sh -h [user@server] -c rstop -t vm1,vm2,vm3\n
+  reboot random chosen vms: ./genv.sh -h [user@server] -c rreboot -t vm1,vm2,vm3\n
+"
+else
+ echo 'not an option'
 fi
